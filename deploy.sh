@@ -1,0 +1,1 @@
+rsync -tvr --progress --chmod=u=rwx --chmod=a+rx * proto public ec2-user@bobgar.com:~/avocado
