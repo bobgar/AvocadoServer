@@ -22,21 +22,10 @@ var bulletId int32 = 0
 
 var state = &pb.GameState{Ships: []*pb.Ship{}}
 
-var rotAcceleration float32 = .01
-var thrust float32 = .5
-
-var worldWidth float32 = 1200
-var worldHeight float32 = 900
-
-var maxVel float32 = 20
-var maxRotVel float32 = .3
-var bulletTTL int64 = 1500
-var rateOfFire int64 = 250
-
 //TODO this is actually really ship + bullet radius for now to simplify calculations
 var bulletRadius float32 = 30
 
-var rotDampen float32 = .98
+var rotDampen float32 = .96
 var velDampen float32 = .98
 
 // Echo the data received on the WebSocket.
@@ -85,9 +74,11 @@ func ReadClient(ws *websocket.Conn) {
 				log.Printf("%v", err)
 			} else {
 				switch message.MessageType {
+				//case pb.GenericMessage_SHIP_NAME:
+
 				case pb.GenericMessage_SHIP_UPDATE:
 					//log.Printf("Got ship update")
-					shipUpdate := new(pb.ShipUpdate)
+					/*shipUpdate := new(pb.ShipUpdate)
 					err := proto.Unmarshal(message.Data, shipUpdate)
 					if err == nil {
 						if shipUpdate.Fire {
@@ -101,7 +92,7 @@ func ReadClient(ws *websocket.Conn) {
 						}
 
 						shipUpdates[ship.Id] = shipUpdate
-					}
+					}*/
 				}
 			}
 		}
@@ -200,6 +191,9 @@ func WorldUpdates() {
 			} else if ship.YPos > worldHeight {
 				ship.YPos -= worldHeight
 			}
+
+			log.Printf("x: %v  ,  y: %v", ship.XPos, ship.YPos)
+
 			ship.XVel *= velDampen
 			ship.YVel *= velDampen
 

@@ -15,39 +15,58 @@ message GenericMessage {
   bytes data = 2;
 }
 
-message Ship {
+// Our list of ships
+message GameState {
+  repeated ShipUpdate ships = 1;
+  repeated BulletUpdate bullets = 2;  
+}
 
-  string name = 1;  //user's name
-  int32 id = 2;  // Unique ID number for this person.
+//No need to send name every time
+message ShipUpdate {
+  id = 1;
+  float xPos = 2;
+  float yPos = 3;
+  float xVel = 4;
+  float yVel = 5;
+  float rot = 7;  //rotation of ship
+  float rotVel = 8; //velocity of the ships rotaiton
+}
+
+message Ship {
+  int32 id = 1;  // Unique ID number for this person.
+  string name = 2;  //user's name  
   float xPos = 3;  // x position of ship
   float yPos = 4;  // y position of ship
   float xVel = 5;  //x velocity
   float yVel = 6;  //y velocity
   float rot = 7;  //rotation of ship
   float rotVel = 8; //velocity of the ships rotaiton
-
-  //TODO eventually do bullets
-  message Bullet {    
-    int32 id = 1;
-    float xPos = 2;
-    float yPos = 3;
-    float xVel = 4;
-    float yVel = 5;
-    int64 timestamp = 6;
-  }
-
-  repeated Bullet bullets = 9;
+  
 }
 
-// Our list of ships
-message GameState {
-  repeated Ship ships = 1;
+
+message Bullet {    
+  int32 id = 1;
+  float xPos = 2;
+  float yPos = 3;
+  float xVel = 4;
+  float yVel = 5;
+  int64 timestamp = 6;
 }
 
+
+//TODO Should 
 message ShipUpdate
 {
   bool rotLeft = 1;
   bool rotRight = 2;
   bool thrust = 3;
-  bool fire = 4;
+  bool ability1 = 4;
+  bool ability2 = 5;
+}
+
+message JoinRoom
+{
+  int32 room = 1
+  string name = 2
 }
