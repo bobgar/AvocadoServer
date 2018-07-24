@@ -8,7 +8,8 @@ message GenericMessage {
   enum MessageTypeEnum {
     GAME_STATE_UPDATE = 0;
     SHIP_UPDATE = 1;
-    NEW_SHIP = 2;
+    JOIN_GAME = 2;
+    SET_TEAM_AND_SHIP = 3;
     
   }
   MessageTypeEnum messageType = 1;
@@ -17,45 +18,43 @@ message GenericMessage {
 
 // Our list of ships
 message GameState {
-  repeated ShipUpdate ships = 1;
-  repeated BulletUpdate bullets = 2;  
+  repeated ObjectUpdate = 1;
+  repeated ScoreUpdate = 2;
+  repeated PlayerJoin = 3;
+  repeated PlayerLeave = 4;
+  repeated SetTeamAndShip = 5;
 }
+
+  enum ObjectTypeEnum {    
+    SHIP = 0;
+    BULLET = 1;
+    //TODO other stuff?    
+  }  
+
+  enum ObjectStateEnum {
+    ALIVE = 0;
+    DEAD = 1;    
+    INVULN = 2;
+    //TODO other stuff?
+  }
 
 //No need to send name every time
-message ShipUpdate {
-  id = 1;
-  float xPos = 2;
-  float yPos = 3;
-  float xVel = 4;
-  float yVel = 5;
-  float rot = 7;  //rotation of ship
-  float rotVel = 8; //velocity of the ships rotaiton
-}
-
-message Ship {
-  int32 id = 1;  // Unique ID number for this person.
-  string name = 2;  //user's name  
-  float xPos = 3;  // x position of ship
-  float yPos = 4;  // y position of ship
-  float xVel = 5;  //x velocity
-  float yVel = 6;  //y velocity
-  float rot = 7;  //rotation of ship
-  float rotVel = 8; //velocity of the ships rotaiton
-  
-}
-
-
-message Bullet {    
+message ObjectUpdate {
   int32 id = 1;
-  float xPos = 2;
-  float yPos = 3;
-  float xVel = 4;
-  float yVel = 5;
-  int64 timestamp = 6;
+  int32 ownerId = 2
+  ObjectTypeEnum type = 3;
+  ObjectState state = 4;
+  float xPos = 5;
+  float yPos = 6;
+  float xVel = 7;
+  float yVel = 8;
+  //NOTE not used by bullet but used by ships and maybe other things (turrets?)
+  float rot = 9;  //rotation of ship
+  float rotVel = 10; //velocity of the ships rotaiton
+  int32 health = 11; //remaining health of ship
 }
 
-
-//TODO Should 
+//TODO Should be a packed byte instead of a bool
 message ShipUpdate
 {
   bool rotLeft = 1;
@@ -65,8 +64,35 @@ message ShipUpdate
   bool ability2 = 5;
 }
 
-message JoinRoom
+message JoinGame
 {
-  int32 room = 1
-  string name = 2
+  int32 gameId = 1;
+}
+
+enum ShipTypeEnum {    
+    HEAVY = 0;
+    FORWARD = 1;
+    SCOUT = 2;
+    // Medic
+    // Engineer
+    // Spy
+  }
+
+message SetTeamAndShip 
+{
+  int32 team = 1;  
+  ShipTypeEnum shipType = 2;
+}
+
+message UpdateTeamAndShip
+{
+  int32 id = 1
+  int32 team = 2
+  ShipTypeEnum = 3
+}
+
+message Login
+{
+  string userName = 1;
+  string password = 2;
 }

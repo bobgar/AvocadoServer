@@ -5,7 +5,6 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
 
 	pb "./proto"
@@ -15,7 +14,10 @@ import (
 )
 
 var clients = make(map[int32]*websocket.Conn)
-var ships = make(map[int32]*pb.Ship)
+var players = make(map[int32]*Player)
+var games = make(map[int32]*Game)
+
+//var ships = make(map[int32]*pb.Ship)
 var shipUpdates = make(map[int32]*pb.ShipUpdate)
 var id int32 = 0
 var bulletId int32 = 0
@@ -30,73 +32,80 @@ var velDampen float32 = .98
 
 // Echo the data received on the WebSocket.
 func ReadClient(ws *websocket.Conn) {
-	clients[id] = ws
-
-	//A new user has connected, create a new ship and add it to our list of ships!
-	ship := new(pb.Ship)
-	ship.Id = id
+	//clients[id] = ws
+	players[id] = &Player{
+		id:        id,
+		state:     SIGN_IN,
+		websocket: ws}
 	id++
-	ship.Name = "ship " + strconv.Itoa(int(id))
-	ship.Rot = 0
-	ship.XPos = rand.Float32() * worldWidth
-	ship.YPos = rand.Float32() * worldHeight
-	state.Ships = append(state.Ships, ship)
 
-	ships[ship.Id] = ship
+	players[id].listen()
 
-	var lastFire int64 = 0
+	/*
+		//A new user has connected, create a new ship and add it to our list of ships!
+		ship := new(pb.Ship)
+		ship.Id = id
+		ship.Name = "ship " + strconv.Itoa(int(id))
+		ship.Rot = 0
+		ship.XPos = rand.Float32() * worldWidth
+		ship.YPos = rand.Float32() * worldHeight
+		state.Ships = append(state.Ships, ship)
 
-	for {
-		data := make([]byte, 100)
-		count, err := ws.Read(data)
+		//ships[ship.Id] = ship
 
-		//log.Printf("%v %v %v", count, err, &data)
-		if err != nil {
-			delete(clients, ship.Id)
-			delete(ships, ship.Id)
-			delete(shipUpdates, ship.Id)
-			for i, curShip := range state.Ships {
-				if ship == curShip {
-					state.Ships = append(state.Ships[:i], state.Ships[i+1:]...)
-				}
-			}
-			//TODO remove ship
-			log.Printf("%v", err)
-			return
-		} else if count > 0 {
-			//TODO for some reason this seems to be the relevant bytes?
-			readSize := data[4]
-			//log.Printf("size : %v", readSize)
-			relevantData := data[8 : readSize+8]
-			//log.Printf("%v", relevantData)
-			message, err := unwrapMessage(&relevantData)
+		//var lastFire int64 = 0
+
+		for {
+			data := make([]byte, 100)
+			count, err := ws.Read(data)
+
+			//log.Printf("%v %v %v", count, err, &data)
 			if err != nil {
+				delete(clients, ship.Id)
+				delete(ships, ship.Id)
+				delete(shipUpdates, ship.Id)
+				for i, curShip := range state.Ships {
+					if ship == curShip {
+						state.Ships = append(state.Ships[:i], state.Ships[i+1:]...)
+					}
+				}
+				//TODO remove ship
 				log.Printf("%v", err)
-			} else {
-				switch message.MessageType {
-				//case pb.GenericMessage_SHIP_NAME:
+				return
+			} else if count > 0 {
+				//TODO for some reason this seems to be the relevant bytes?
+				readSize := data[4]
+				//log.Printf("size : %v", readSize)
+				relevantData := data[8 : readSize+8]
+				//log.Printf("%v", relevantData)
+				message, err := unwrapMessage(&relevantData)
+				if err != nil {
+					log.Printf("%v", err)
+				} else {
+					switch message.MessageType {
+					//case pb.GenericMessage_SHIP_NAME:
 
-				case pb.GenericMessage_SHIP_UPDATE:
-					//log.Printf("Got ship update")
-					/*shipUpdate := new(pb.ShipUpdate)
-					err := proto.Unmarshal(message.Data, shipUpdate)
-					if err == nil {
-						if shipUpdate.Fire {
-							now := time.Now()
-							timestamp := now.UnixNano()
-							if (timestamp-lastFire)/1000000 > rateOfFire {
-								lastFire = timestamp
-							} else {
-								shipUpdate.Fire = false
+					case pb.GenericMessage_SHIP_UPDATE:
+						//log.Printf("Got ship update")
+						shipUpdate := new(pb.ShipUpdate)
+						err := proto.Unmarshal(message.Data, shipUpdate)
+						if err == nil {
+							if shipUpdate.Fire {
+								now := time.Now()
+								timestamp := now.UnixNano()
+								if (timestamp-lastFire)/1000000 > rateOfFire {
+									lastFire = timestamp
+								} else {
+									shipUpdate.Fire = false
+								}
 							}
-						}
 
-						shipUpdates[ship.Id] = shipUpdate
-					}*/
+							shipUpdates[ship.Id] = shipUpdate
+						}
+					}
 				}
 			}
-		}
-	}
+		}*/
 }
 
 func unwrapMessage(data *[]byte) (pb.GenericMessage, error) {

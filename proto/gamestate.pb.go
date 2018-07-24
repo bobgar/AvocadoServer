@@ -41,7 +41,36 @@ func (x GenericMessage_MessageTypeEnum) String() string {
 	return proto.EnumName(GenericMessage_MessageTypeEnum_name, int32(x))
 }
 func (GenericMessage_MessageTypeEnum) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_gamestate_7bbe1fe9df4558eb, []int{0, 0}
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{0, 0}
+}
+
+type SetTeamAndShip_ShipTypeEnum int32
+
+const (
+	SetTeamAndShip_BLOCKER SetTeamAndShip_ShipTypeEnum = 0
+	SetTeamAndShip_HEAVY   SetTeamAndShip_ShipTypeEnum = 1
+	SetTeamAndShip_FORWARD SetTeamAndShip_ShipTypeEnum = 2
+	SetTeamAndShip_SCOUT   SetTeamAndShip_ShipTypeEnum = 3
+)
+
+var SetTeamAndShip_ShipTypeEnum_name = map[int32]string{
+	0: "BLOCKER",
+	1: "HEAVY",
+	2: "FORWARD",
+	3: "SCOUT",
+}
+var SetTeamAndShip_ShipTypeEnum_value = map[string]int32{
+	"BLOCKER": 0,
+	"HEAVY":   1,
+	"FORWARD": 2,
+	"SCOUT":   3,
+}
+
+func (x SetTeamAndShip_ShipTypeEnum) String() string {
+	return proto.EnumName(SetTeamAndShip_ShipTypeEnum_name, int32(x))
+}
+func (SetTeamAndShip_ShipTypeEnum) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{6, 0}
 }
 
 // This is the only message we send and recieve
@@ -58,7 +87,7 @@ func (m *GenericMessage) Reset()         { *m = GenericMessage{} }
 func (m *GenericMessage) String() string { return proto.CompactTextString(m) }
 func (*GenericMessage) ProtoMessage()    {}
 func (*GenericMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gamestate_7bbe1fe9df4558eb, []int{0}
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{0}
 }
 func (m *GenericMessage) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GenericMessage.Unmarshal(m, b)
@@ -92,200 +121,19 @@ func (m *GenericMessage) GetData() []byte {
 	return nil
 }
 
-type Ship struct {
-	Name                 string         `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Id                   int32          `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
-	XPos                 float32        `protobuf:"fixed32,3,opt,name=xPos,proto3" json:"xPos,omitempty"`
-	YPos                 float32        `protobuf:"fixed32,4,opt,name=yPos,proto3" json:"yPos,omitempty"`
-	XVel                 float32        `protobuf:"fixed32,5,opt,name=xVel,proto3" json:"xVel,omitempty"`
-	YVel                 float32        `protobuf:"fixed32,6,opt,name=yVel,proto3" json:"yVel,omitempty"`
-	Rot                  float32        `protobuf:"fixed32,7,opt,name=rot,proto3" json:"rot,omitempty"`
-	RotVel               float32        `protobuf:"fixed32,8,opt,name=rotVel,proto3" json:"rotVel,omitempty"`
-	Bullets              []*Ship_Bullet `protobuf:"bytes,9,rep,name=bullets,proto3" json:"bullets,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_unrecognized     []byte         `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
-}
-
-func (m *Ship) Reset()         { *m = Ship{} }
-func (m *Ship) String() string { return proto.CompactTextString(m) }
-func (*Ship) ProtoMessage()    {}
-func (*Ship) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gamestate_7bbe1fe9df4558eb, []int{1}
-}
-func (m *Ship) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Ship.Unmarshal(m, b)
-}
-func (m *Ship) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Ship.Marshal(b, m, deterministic)
-}
-func (dst *Ship) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Ship.Merge(dst, src)
-}
-func (m *Ship) XXX_Size() int {
-	return xxx_messageInfo_Ship.Size(m)
-}
-func (m *Ship) XXX_DiscardUnknown() {
-	xxx_messageInfo_Ship.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Ship proto.InternalMessageInfo
-
-func (m *Ship) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *Ship) GetId() int32 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
-func (m *Ship) GetXPos() float32 {
-	if m != nil {
-		return m.XPos
-	}
-	return 0
-}
-
-func (m *Ship) GetYPos() float32 {
-	if m != nil {
-		return m.YPos
-	}
-	return 0
-}
-
-func (m *Ship) GetXVel() float32 {
-	if m != nil {
-		return m.XVel
-	}
-	return 0
-}
-
-func (m *Ship) GetYVel() float32 {
-	if m != nil {
-		return m.YVel
-	}
-	return 0
-}
-
-func (m *Ship) GetRot() float32 {
-	if m != nil {
-		return m.Rot
-	}
-	return 0
-}
-
-func (m *Ship) GetRotVel() float32 {
-	if m != nil {
-		return m.RotVel
-	}
-	return 0
-}
-
-func (m *Ship) GetBullets() []*Ship_Bullet {
-	if m != nil {
-		return m.Bullets
-	}
-	return nil
-}
-
-// TODO eventually do bullets
-type Ship_Bullet struct {
-	Id                   int32    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	XPos                 float32  `protobuf:"fixed32,2,opt,name=xPos,proto3" json:"xPos,omitempty"`
-	YPos                 float32  `protobuf:"fixed32,3,opt,name=yPos,proto3" json:"yPos,omitempty"`
-	XVel                 float32  `protobuf:"fixed32,4,opt,name=xVel,proto3" json:"xVel,omitempty"`
-	YVel                 float32  `protobuf:"fixed32,5,opt,name=yVel,proto3" json:"yVel,omitempty"`
-	Timestamp            int64    `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Ship_Bullet) Reset()         { *m = Ship_Bullet{} }
-func (m *Ship_Bullet) String() string { return proto.CompactTextString(m) }
-func (*Ship_Bullet) ProtoMessage()    {}
-func (*Ship_Bullet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gamestate_7bbe1fe9df4558eb, []int{1, 0}
-}
-func (m *Ship_Bullet) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Ship_Bullet.Unmarshal(m, b)
-}
-func (m *Ship_Bullet) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Ship_Bullet.Marshal(b, m, deterministic)
-}
-func (dst *Ship_Bullet) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Ship_Bullet.Merge(dst, src)
-}
-func (m *Ship_Bullet) XXX_Size() int {
-	return xxx_messageInfo_Ship_Bullet.Size(m)
-}
-func (m *Ship_Bullet) XXX_DiscardUnknown() {
-	xxx_messageInfo_Ship_Bullet.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Ship_Bullet proto.InternalMessageInfo
-
-func (m *Ship_Bullet) GetId() int32 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
-func (m *Ship_Bullet) GetXPos() float32 {
-	if m != nil {
-		return m.XPos
-	}
-	return 0
-}
-
-func (m *Ship_Bullet) GetYPos() float32 {
-	if m != nil {
-		return m.YPos
-	}
-	return 0
-}
-
-func (m *Ship_Bullet) GetXVel() float32 {
-	if m != nil {
-		return m.XVel
-	}
-	return 0
-}
-
-func (m *Ship_Bullet) GetYVel() float32 {
-	if m != nil {
-		return m.YVel
-	}
-	return 0
-}
-
-func (m *Ship_Bullet) GetTimestamp() int64 {
-	if m != nil {
-		return m.Timestamp
-	}
-	return 0
-}
-
 // Our list of ships
 type GameState struct {
-	Ships                []*Ship  `protobuf:"bytes,1,rep,name=ships,proto3" json:"ships,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Ships                []*ShipState `protobuf:"bytes,1,rep,name=ships,proto3" json:"ships,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
 }
 
 func (m *GameState) Reset()         { *m = GameState{} }
 func (m *GameState) String() string { return proto.CompactTextString(m) }
 func (*GameState) ProtoMessage()    {}
 func (*GameState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gamestate_7bbe1fe9df4558eb, []int{2}
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{1}
 }
 func (m *GameState) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GameState.Unmarshal(m, b)
@@ -305,18 +153,185 @@ func (m *GameState) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GameState proto.InternalMessageInfo
 
-func (m *GameState) GetShips() []*Ship {
+func (m *GameState) GetShips() []*ShipState {
 	if m != nil {
 		return m.Ships
 	}
 	return nil
 }
 
+// No need to send name every time
+type ShipState struct {
+	Id                   int32    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	XPos                 float32  `protobuf:"fixed32,2,opt,name=xPos,proto3" json:"xPos,omitempty"`
+	YPos                 float32  `protobuf:"fixed32,3,opt,name=yPos,proto3" json:"yPos,omitempty"`
+	XVel                 float32  `protobuf:"fixed32,4,opt,name=xVel,proto3" json:"xVel,omitempty"`
+	YVel                 float32  `protobuf:"fixed32,5,opt,name=yVel,proto3" json:"yVel,omitempty"`
+	Rot                  float32  `protobuf:"fixed32,7,opt,name=rot,proto3" json:"rot,omitempty"`
+	RotVel               float32  `protobuf:"fixed32,8,opt,name=rotVel,proto3" json:"rotVel,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ShipState) Reset()         { *m = ShipState{} }
+func (m *ShipState) String() string { return proto.CompactTextString(m) }
+func (*ShipState) ProtoMessage()    {}
+func (*ShipState) Descriptor() ([]byte, []int) {
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{2}
+}
+func (m *ShipState) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ShipState.Unmarshal(m, b)
+}
+func (m *ShipState) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ShipState.Marshal(b, m, deterministic)
+}
+func (dst *ShipState) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ShipState.Merge(dst, src)
+}
+func (m *ShipState) XXX_Size() int {
+	return xxx_messageInfo_ShipState.Size(m)
+}
+func (m *ShipState) XXX_DiscardUnknown() {
+	xxx_messageInfo_ShipState.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ShipState proto.InternalMessageInfo
+
+func (m *ShipState) GetId() int32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *ShipState) GetXPos() float32 {
+	if m != nil {
+		return m.XPos
+	}
+	return 0
+}
+
+func (m *ShipState) GetYPos() float32 {
+	if m != nil {
+		return m.YPos
+	}
+	return 0
+}
+
+func (m *ShipState) GetXVel() float32 {
+	if m != nil {
+		return m.XVel
+	}
+	return 0
+}
+
+func (m *ShipState) GetYVel() float32 {
+	if m != nil {
+		return m.YVel
+	}
+	return 0
+}
+
+func (m *ShipState) GetRot() float32 {
+	if m != nil {
+		return m.Rot
+	}
+	return 0
+}
+
+func (m *ShipState) GetRotVel() float32 {
+	if m != nil {
+		return m.RotVel
+	}
+	return 0
+}
+
+type Bullet struct {
+	Id                   int32    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	XPos                 float32  `protobuf:"fixed32,2,opt,name=xPos,proto3" json:"xPos,omitempty"`
+	YPos                 float32  `protobuf:"fixed32,3,opt,name=yPos,proto3" json:"yPos,omitempty"`
+	XVel                 float32  `protobuf:"fixed32,4,opt,name=xVel,proto3" json:"xVel,omitempty"`
+	YVel                 float32  `protobuf:"fixed32,5,opt,name=yVel,proto3" json:"yVel,omitempty"`
+	Timestamp            int64    `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Bullet) Reset()         { *m = Bullet{} }
+func (m *Bullet) String() string { return proto.CompactTextString(m) }
+func (*Bullet) ProtoMessage()    {}
+func (*Bullet) Descriptor() ([]byte, []int) {
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{3}
+}
+func (m *Bullet) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Bullet.Unmarshal(m, b)
+}
+func (m *Bullet) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Bullet.Marshal(b, m, deterministic)
+}
+func (dst *Bullet) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Bullet.Merge(dst, src)
+}
+func (m *Bullet) XXX_Size() int {
+	return xxx_messageInfo_Bullet.Size(m)
+}
+func (m *Bullet) XXX_DiscardUnknown() {
+	xxx_messageInfo_Bullet.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Bullet proto.InternalMessageInfo
+
+func (m *Bullet) GetId() int32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *Bullet) GetXPos() float32 {
+	if m != nil {
+		return m.XPos
+	}
+	return 0
+}
+
+func (m *Bullet) GetYPos() float32 {
+	if m != nil {
+		return m.YPos
+	}
+	return 0
+}
+
+func (m *Bullet) GetXVel() float32 {
+	if m != nil {
+		return m.XVel
+	}
+	return 0
+}
+
+func (m *Bullet) GetYVel() float32 {
+	if m != nil {
+		return m.YVel
+	}
+	return 0
+}
+
+func (m *Bullet) GetTimestamp() int64 {
+	if m != nil {
+		return m.Timestamp
+	}
+	return 0
+}
+
+// TODO Should be a packed byte instead of a bool
 type ShipUpdate struct {
 	RotLeft              bool     `protobuf:"varint,1,opt,name=rotLeft,proto3" json:"rotLeft,omitempty"`
 	RotRight             bool     `protobuf:"varint,2,opt,name=rotRight,proto3" json:"rotRight,omitempty"`
 	Thrust               bool     `protobuf:"varint,3,opt,name=thrust,proto3" json:"thrust,omitempty"`
-	Fire                 bool     `protobuf:"varint,4,opt,name=fire,proto3" json:"fire,omitempty"`
+	Ability1             bool     `protobuf:"varint,4,opt,name=ability1,proto3" json:"ability1,omitempty"`
+	Ability2             bool     `protobuf:"varint,5,opt,name=ability2,proto3" json:"ability2,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -326,7 +341,7 @@ func (m *ShipUpdate) Reset()         { *m = ShipUpdate{} }
 func (m *ShipUpdate) String() string { return proto.CompactTextString(m) }
 func (*ShipUpdate) ProtoMessage()    {}
 func (*ShipUpdate) Descriptor() ([]byte, []int) {
-	return fileDescriptor_gamestate_7bbe1fe9df4558eb, []int{3}
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{4}
 }
 func (m *ShipUpdate) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ShipUpdate.Unmarshal(m, b)
@@ -367,50 +382,198 @@ func (m *ShipUpdate) GetThrust() bool {
 	return false
 }
 
-func (m *ShipUpdate) GetFire() bool {
+func (m *ShipUpdate) GetAbility1() bool {
 	if m != nil {
-		return m.Fire
+		return m.Ability1
 	}
 	return false
 }
 
-func init() {
-	proto.RegisterType((*GenericMessage)(nil), "GenericMessage")
-	proto.RegisterType((*Ship)(nil), "Ship")
-	proto.RegisterType((*Ship_Bullet)(nil), "Ship.Bullet")
-	proto.RegisterType((*GameState)(nil), "GameState")
-	proto.RegisterType((*ShipUpdate)(nil), "ShipUpdate")
-	proto.RegisterEnum("GenericMessage_MessageTypeEnum", GenericMessage_MessageTypeEnum_name, GenericMessage_MessageTypeEnum_value)
+func (m *ShipUpdate) GetAbility2() bool {
+	if m != nil {
+		return m.Ability2
+	}
+	return false
 }
 
-func init() { proto.RegisterFile("gamestate.proto", fileDescriptor_gamestate_7bbe1fe9df4558eb) }
+type JoinGame struct {
+	GameId               int32    `protobuf:"varint,1,opt,name=gameId,proto3" json:"gameId,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
 
-var fileDescriptor_gamestate_7bbe1fe9df4558eb = []byte{
-	// 411 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x92, 0xdf, 0x8a, 0xd3, 0x40,
-	0x14, 0xc6, 0x9d, 0xa4, 0x69, 0xd3, 0xd3, 0xd2, 0xd6, 0x01, 0x65, 0x58, 0x05, 0x4b, 0x2e, 0x24,
-	0x57, 0xb9, 0x58, 0x9f, 0xa0, 0x62, 0x88, 0x82, 0x95, 0x32, 0xc9, 0xae, 0x97, 0x25, 0x6b, 0x66,
-	0x9b, 0x81, 0xfc, 0x63, 0x66, 0x0a, 0xdb, 0x17, 0xf0, 0x79, 0x7c, 0x19, 0xdf, 0x47, 0xe6, 0x24,
-	0x75, 0x57, 0xb7, 0x77, 0xdf, 0xf9, 0xf5, 0x1b, 0xe6, 0x77, 0x9a, 0x81, 0xe5, 0x21, 0xaf, 0x85,
-	0x36, 0xb9, 0x11, 0x51, 0xa7, 0x5a, 0xd3, 0x06, 0xbf, 0x08, 0x2c, 0x12, 0xd1, 0x08, 0x25, 0x7f,
-	0x6c, 0x85, 0xd6, 0xf9, 0x41, 0xd0, 0x0d, 0xcc, 0xea, 0x3e, 0x66, 0xa7, 0x4e, 0x30, 0xb2, 0x26,
-	0xe1, 0xe2, 0xfa, 0x5d, 0xf4, 0x6f, 0x2b, 0xda, 0x3e, 0x56, 0xe2, 0xe6, 0x58, 0xf3, 0xa7, 0x67,
-	0x28, 0x85, 0x51, 0x91, 0x9b, 0x9c, 0x39, 0x6b, 0x12, 0xce, 0x39, 0xe6, 0x20, 0x81, 0xe5, 0x7f,
-	0x67, 0xe8, 0x2b, 0x78, 0x99, 0x6c, 0xb6, 0xf1, 0x3e, 0xcd, 0x36, 0x59, 0xbc, 0xbf, 0xd9, 0x7d,
-	0xda, 0x64, 0xf1, 0xea, 0x05, 0x5d, 0xc2, 0x2c, 0xfd, 0xfc, 0x65, 0x77, 0x06, 0x84, 0xce, 0xc1,
-	0xff, 0x16, 0x7f, 0xdf, 0x5b, 0xb8, 0x72, 0x82, 0xdf, 0x0e, 0x8c, 0xd2, 0x52, 0x76, 0xf6, 0x96,
-	0x26, 0xaf, 0x7b, 0xc3, 0x29, 0xc7, 0x4c, 0x17, 0xe0, 0xc8, 0x02, 0xef, 0xf5, 0xb8, 0x23, 0x0b,
-	0xdb, 0x79, 0xd8, 0xb5, 0x9a, 0xb9, 0x6b, 0x12, 0x3a, 0x1c, 0xb3, 0x65, 0x27, 0xcb, 0x46, 0x3d,
-	0x3b, 0x0d, 0xec, 0xe1, 0x56, 0x54, 0xcc, 0x1b, 0x7a, 0xb7, 0xa2, 0xc2, 0x9e, 0x65, 0xe3, 0xa1,
-	0x67, 0xd9, 0x0a, 0x5c, 0xd5, 0x1a, 0x36, 0x41, 0x64, 0x23, 0x7d, 0x0d, 0x63, 0xd5, 0x1a, 0xdb,
-	0xf3, 0x11, 0x0e, 0x13, 0x7d, 0x0f, 0x93, 0xbb, 0x63, 0x55, 0x09, 0xa3, 0xd9, 0x74, 0xed, 0x86,
-	0xb3, 0xeb, 0x79, 0x64, 0xad, 0xa3, 0x8f, 0x08, 0xf9, 0xf9, 0xc7, 0xab, 0x9f, 0x04, 0xc6, 0x3d,
-	0x1b, 0xe4, 0xc9, 0x33, 0x79, 0xe7, 0x82, 0xbc, 0x7b, 0x41, 0x7e, 0x74, 0x41, 0xde, 0x7b, 0x22,
-	0xff, 0x16, 0xa6, 0x46, 0xe2, 0xf7, 0xaf, 0x3b, 0xdc, 0xca, 0xe5, 0x8f, 0x20, 0x08, 0x61, 0x9a,
-	0xe4, 0xb5, 0x48, 0xed, 0xeb, 0xa0, 0x6f, 0xc0, 0xd3, 0xa5, 0xec, 0x34, 0x23, 0xe8, 0xee, 0xa1,
-	0x3b, 0xef, 0x59, 0xd0, 0x00, 0xd8, 0xf1, 0xa6, 0x2b, 0x6c, 0x95, 0xc1, 0x44, 0xb5, 0xe6, 0xab,
-	0xb8, 0x37, 0xa8, 0xee, 0xf3, 0xf3, 0x48, 0xaf, 0xc0, 0x57, 0xad, 0xe1, 0xf2, 0x50, 0x1a, 0xdc,
-	0xc1, 0xe7, 0x7f, 0x67, 0xfb, 0xb7, 0x99, 0x52, 0x1d, 0xb5, 0xc1, 0x4d, 0x7c, 0x3e, 0x4c, 0xd6,
-	0xfb, 0x5e, 0x2a, 0x81, 0xbb, 0xf8, 0x1c, 0xf3, 0xdd, 0x18, 0xdf, 0xea, 0x87, 0x3f, 0x01, 0x00,
-	0x00, 0xff, 0xff, 0xcc, 0x4b, 0x17, 0x44, 0xbe, 0x02, 0x00, 0x00,
+func (m *JoinGame) Reset()         { *m = JoinGame{} }
+func (m *JoinGame) String() string { return proto.CompactTextString(m) }
+func (*JoinGame) ProtoMessage()    {}
+func (*JoinGame) Descriptor() ([]byte, []int) {
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{5}
+}
+func (m *JoinGame) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_JoinGame.Unmarshal(m, b)
+}
+func (m *JoinGame) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_JoinGame.Marshal(b, m, deterministic)
+}
+func (dst *JoinGame) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JoinGame.Merge(dst, src)
+}
+func (m *JoinGame) XXX_Size() int {
+	return xxx_messageInfo_JoinGame.Size(m)
+}
+func (m *JoinGame) XXX_DiscardUnknown() {
+	xxx_messageInfo_JoinGame.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_JoinGame proto.InternalMessageInfo
+
+func (m *JoinGame) GetGameId() int32 {
+	if m != nil {
+		return m.GameId
+	}
+	return 0
+}
+
+type SetTeamAndShip struct {
+	Team                 int32                       `protobuf:"varint,1,opt,name=team,proto3" json:"team,omitempty"`
+	ShipType             SetTeamAndShip_ShipTypeEnum `protobuf:"varint,2,opt,name=shipType,proto3,enum=SetTeamAndShip_ShipTypeEnum" json:"shipType,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_unrecognized     []byte                      `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
+}
+
+func (m *SetTeamAndShip) Reset()         { *m = SetTeamAndShip{} }
+func (m *SetTeamAndShip) String() string { return proto.CompactTextString(m) }
+func (*SetTeamAndShip) ProtoMessage()    {}
+func (*SetTeamAndShip) Descriptor() ([]byte, []int) {
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{6}
+}
+func (m *SetTeamAndShip) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SetTeamAndShip.Unmarshal(m, b)
+}
+func (m *SetTeamAndShip) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SetTeamAndShip.Marshal(b, m, deterministic)
+}
+func (dst *SetTeamAndShip) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SetTeamAndShip.Merge(dst, src)
+}
+func (m *SetTeamAndShip) XXX_Size() int {
+	return xxx_messageInfo_SetTeamAndShip.Size(m)
+}
+func (m *SetTeamAndShip) XXX_DiscardUnknown() {
+	xxx_messageInfo_SetTeamAndShip.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SetTeamAndShip proto.InternalMessageInfo
+
+func (m *SetTeamAndShip) GetTeam() int32 {
+	if m != nil {
+		return m.Team
+	}
+	return 0
+}
+
+func (m *SetTeamAndShip) GetShipType() SetTeamAndShip_ShipTypeEnum {
+	if m != nil {
+		return m.ShipType
+	}
+	return SetTeamAndShip_BLOCKER
+}
+
+type Login struct {
+	UserName             string   `protobuf:"bytes,1,opt,name=userName,proto3" json:"userName,omitempty"`
+	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Login) Reset()         { *m = Login{} }
+func (m *Login) String() string { return proto.CompactTextString(m) }
+func (*Login) ProtoMessage()    {}
+func (*Login) Descriptor() ([]byte, []int) {
+	return fileDescriptor_gamestate_b0682d5a03d4c831, []int{7}
+}
+func (m *Login) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Login.Unmarshal(m, b)
+}
+func (m *Login) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Login.Marshal(b, m, deterministic)
+}
+func (dst *Login) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Login.Merge(dst, src)
+}
+func (m *Login) XXX_Size() int {
+	return xxx_messageInfo_Login.Size(m)
+}
+func (m *Login) XXX_DiscardUnknown() {
+	xxx_messageInfo_Login.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Login proto.InternalMessageInfo
+
+func (m *Login) GetUserName() string {
+	if m != nil {
+		return m.UserName
+	}
+	return ""
+}
+
+func (m *Login) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+func init() {
+	proto.RegisterType((*GenericMessage)(nil), "GenericMessage")
+	proto.RegisterType((*GameState)(nil), "GameState")
+	proto.RegisterType((*ShipState)(nil), "ShipState")
+	proto.RegisterType((*Bullet)(nil), "Bullet")
+	proto.RegisterType((*ShipUpdate)(nil), "ShipUpdate")
+	proto.RegisterType((*JoinGame)(nil), "JoinGame")
+	proto.RegisterType((*SetTeamAndShip)(nil), "SetTeamAndShip")
+	proto.RegisterType((*Login)(nil), "Login")
+	proto.RegisterEnum("GenericMessage_MessageTypeEnum", GenericMessage_MessageTypeEnum_name, GenericMessage_MessageTypeEnum_value)
+	proto.RegisterEnum("SetTeamAndShip_ShipTypeEnum", SetTeamAndShip_ShipTypeEnum_name, SetTeamAndShip_ShipTypeEnum_value)
+}
+
+func init() { proto.RegisterFile("gamestate.proto", fileDescriptor_gamestate_b0682d5a03d4c831) }
+
+var fileDescriptor_gamestate_b0682d5a03d4c831 = []byte{
+	// 523 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x93, 0xc1, 0x6e, 0xda, 0x40,
+	0x10, 0x86, 0xb3, 0x26, 0x10, 0x7b, 0x88, 0xc0, 0x5d, 0xa9, 0x95, 0x55, 0x45, 0x2a, 0xda, 0x13,
+	0x97, 0x22, 0x95, 0x5e, 0x7a, 0x6a, 0xe5, 0x24, 0x2e, 0x49, 0x0b, 0x01, 0xad, 0x0d, 0x51, 0x4f,
+	0x68, 0x53, 0x6f, 0x61, 0x25, 0x8c, 0x2d, 0x7b, 0x51, 0xc3, 0x0b, 0xf4, 0x01, 0x2a, 0xf5, 0xda,
+	0x67, 0xe8, 0x23, 0x56, 0xb3, 0x18, 0x43, 0x7a, 0xef, 0x6d, 0xfe, 0x6f, 0xfe, 0xb5, 0xfe, 0x59,
+	0xcf, 0x42, 0x7b, 0x21, 0x12, 0x59, 0x68, 0xa1, 0x65, 0x2f, 0xcb, 0x53, 0x9d, 0xb2, 0x3f, 0x04,
+	0x5a, 0x03, 0xb9, 0x96, 0xb9, 0xfa, 0x3a, 0x92, 0x45, 0x21, 0x16, 0x92, 0xfa, 0xd0, 0x4c, 0x76,
+	0x65, 0xb4, 0xcd, 0xa4, 0x47, 0x3a, 0xa4, 0xdb, 0xea, 0xbf, 0xea, 0x3d, 0x75, 0xf5, 0x46, 0x07,
+	0x4b, 0xb0, 0xde, 0x24, 0xfc, 0xf8, 0x0c, 0xa5, 0x70, 0x1a, 0x0b, 0x2d, 0x3c, 0xab, 0x43, 0xba,
+	0xe7, 0xdc, 0xd4, 0x6c, 0x00, 0xed, 0x7f, 0xce, 0xd0, 0xe7, 0xf0, 0x6c, 0xe0, 0x8f, 0x82, 0x79,
+	0x18, 0xf9, 0x51, 0x30, 0x9f, 0x4e, 0xae, 0xfd, 0x28, 0x70, 0x4f, 0x68, 0x1b, 0x9a, 0xe1, 0xcd,
+	0xed, 0x64, 0x0f, 0x08, 0x3d, 0x07, 0xfb, 0x2e, 0xb8, 0x9f, 0x23, 0x74, 0x2d, 0xf6, 0x1a, 0x9c,
+	0x81, 0x48, 0x64, 0x88, 0x53, 0xd0, 0x0e, 0xd4, 0x8b, 0xa5, 0xca, 0x0a, 0x8f, 0x74, 0x6a, 0xdd,
+	0x66, 0x1f, 0x7a, 0xe1, 0x52, 0x65, 0xa6, 0xc5, 0x77, 0x0d, 0xf6, 0x8b, 0x80, 0x53, 0x41, 0xda,
+	0x02, 0x4b, 0xc5, 0x66, 0xa6, 0x3a, 0xb7, 0x54, 0x8c, 0x49, 0x1f, 0x27, 0x69, 0x61, 0x92, 0x5a,
+	0xdc, 0xd4, 0xc8, 0xb6, 0xc8, 0x6a, 0x3b, 0xb6, 0x2d, 0xd9, 0xe3, 0x4c, 0xae, 0xbc, 0xd3, 0xd2,
+	0x37, 0x93, 0x2b, 0xe3, 0x43, 0x56, 0x2f, 0x7d, 0xc8, 0x5c, 0xa8, 0xe5, 0xa9, 0xf6, 0xce, 0x0c,
+	0xc2, 0x92, 0xbe, 0x80, 0x46, 0x9e, 0x6a, 0xf4, 0xd9, 0x06, 0x96, 0x8a, 0xfd, 0x20, 0xd0, 0xb8,
+	0xdc, 0xac, 0x56, 0x52, 0xff, 0xf7, 0x50, 0x17, 0xe0, 0x68, 0x65, 0xfe, 0x7b, 0x92, 0x79, 0x8d,
+	0x0e, 0xe9, 0xd6, 0xf8, 0x01, 0xb0, 0x9f, 0x04, 0x00, 0x2f, 0x68, 0x9a, 0xc5, 0x78, 0x43, 0x1e,
+	0x9c, 0xe5, 0xa9, 0x1e, 0xca, 0x6f, 0xda, 0x24, 0xb2, 0xf9, 0x5e, 0xd2, 0x97, 0x60, 0xe7, 0xa9,
+	0xe6, 0x6a, 0xb1, 0xd4, 0x26, 0x9a, 0xcd, 0x2b, 0x8d, 0x53, 0xea, 0x65, 0xbe, 0x29, 0xb4, 0x09,
+	0x68, 0xf3, 0x52, 0xe1, 0x19, 0xf1, 0xa0, 0x56, 0x4a, 0x6f, 0xdf, 0x98, 0x98, 0x36, 0xaf, 0xf4,
+	0x51, 0xaf, 0x6f, 0xe2, 0x1e, 0x7a, 0x7d, 0xc6, 0xc0, 0xfe, 0x94, 0xaa, 0x35, 0xfe, 0x68, 0xfc,
+	0x36, 0xae, 0xed, 0xed, 0xfe, 0x8a, 0x4a, 0xc5, 0x7e, 0x13, 0x68, 0x85, 0x52, 0x47, 0x52, 0x24,
+	0xfe, 0x3a, 0xc6, 0x11, 0x70, 0x7a, 0x2d, 0x45, 0x52, 0x1a, 0x4d, 0x4d, 0xdf, 0x81, 0x8d, 0x9b,
+	0x60, 0x96, 0xd9, 0x32, 0xcb, 0x7c, 0xd1, 0x7b, 0x7a, 0xcc, 0x2c, 0x4d, 0xb5, 0xc9, 0x95, 0x9b,
+	0xbd, 0x87, 0xf3, 0xe3, 0x0e, 0x6d, 0xc2, 0xd9, 0xe5, 0x70, 0x7c, 0xf5, 0x39, 0xe0, 0xee, 0x09,
+	0x75, 0xa0, 0x7e, 0x13, 0xf8, 0xb3, 0x2f, 0x2e, 0x41, 0xfe, 0x71, 0xcc, 0xef, 0x7d, 0x7e, 0xed,
+	0x5a, 0xc8, 0xc3, 0xab, 0xf1, 0x34, 0x72, 0x6b, 0xec, 0x03, 0xd4, 0x87, 0xe9, 0x42, 0xad, 0x71,
+	0xd2, 0x4d, 0x21, 0xf3, 0x3b, 0x91, 0xec, 0xde, 0x93, 0xc3, 0x2b, 0x8d, 0xbd, 0x4c, 0x14, 0xc5,
+	0xf7, 0x34, 0x8f, 0x4d, 0x3c, 0x87, 0x57, 0xfa, 0xa1, 0x61, 0x1e, 0xe9, 0xdb, 0xbf, 0x01, 0x00,
+	0x00, 0xff, 0xff, 0x4d, 0x5f, 0x07, 0x10, 0xb7, 0x03, 0x00, 0x00,
 }
