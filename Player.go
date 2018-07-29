@@ -25,14 +25,14 @@ type Player struct {
 	name      string
 	state     PlayerState
 	gameId    int32
-	ship      Ship
+	ship      *Ship
 	websocket *websocket.Conn
 }
 
 func (player Player) listen() {
 	for {
-		data := make([]byte, 200)
-		count, err := player.websocket.Read(data)
+		data := make([]byte, 1000)
+		_, err := player.websocket.Read(data)
 
 		//If we ever get an error reading from the socket, assume the socket was closed and delete it.
 		if err != nil {
@@ -48,7 +48,7 @@ func (player Player) listen() {
 		//Any other packet type will result in connection termination
 		if player.state == INITIAL_CONNECT {
 			login := new(pb.Login)
-			err := proto.Unmarshal(message.Data, login)
+			err := proto.Unmarshal(data, login)
 			//If we have an error on login abort the connection
 			if err != nil {
 				log.Printf("%v", err)
@@ -56,7 +56,7 @@ func (player Player) listen() {
 			} else {
 				//TODO in the future this will check a database and do an actual user login.
 				//For now this just reads the username field.
-				player.name = login.userName
+				player.name = login.UserName
 				player.state = LOGGED_IN
 			}
 
@@ -69,17 +69,32 @@ func (player Player) listen() {
 				switch message.MessageType {
 				case pb.GenericMessage_JOIN_GAME:
 					player.joinGame(message.Data)
-				case pb.GenericMessage_SET_SHIP_AND_TEAM:
+				case pb.GenericMessage_SET_TEAM_AND_SHIP:
 					if player.state == IN_GAME {
 						player.setShipAndTeam(message.Data)
 					}
 				case pb.GenericMessage_SHIP_UPDATE:
 					if player.state == IN_GAME && player.ship != nil {
-						player.ship.handleInput(message.Data)
+						player.handleInput(message.Data)
 					}
 				}
 			}
 		}
+	}
+}
+
+func (player Player) handleInput(data []byte) {
+	shipUpdate := new(pb.ShipUpdate)
+	err := proto.Unmarshal(data, shipUpdate)
+	if err == nil {
+		if shipUpdate.Ability1 {
+			used := player.ship.ability1.use(player)
+			if used {
+				player.ship.needsUpdate = true
+			}
+		}
+
+		player.ship.shipUpdate = shipUpdate
 	}
 }
 
@@ -90,15 +105,18 @@ func (player Player) joinGame(data []byte) {
 		if player.state == IN_GAME {
 			games[player.gameId].removePlayer(&player)
 		}
-		//If the game exists join it, if not create and then join it
-		if val, ok := games[joinGame.gameId]; ok {
+		if val, ok := games[joinGame.GameId]; ok {
+			//If the game exists join it
 			val.addPlayer(&player)
 		} else {
-			games[joinGame.id] = &Game{
+			//If it doesn't exist create the new game
+			games[joinGame.GameId] = &Game{
 				players: make(map[int32]*Player),
-				id:      joinGame.gameId,
-				defaultGameDef}
-			games[joinGame.id].addPlayer(&player)
+				id:      joinGame.GameId,
+				GameDef: &defaultGameDef}
+			games[joinGame.GameId].addPlayer(&player)
+			//then start the update loop thread
+			go games[joinGame.GameId].update()
 		}
 
 		player.state = IN_GAME

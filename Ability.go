@@ -1,9 +1,13 @@
 package main
 
-import "time"
+import (
+	"time"
+
+	pb "./proto"
+)
 
 type Ability interface {
-	use() bool
+	use(Player) bool
 }
 
 type GunDef struct {
@@ -20,18 +24,30 @@ type Gun struct {
 	lastFire int64
 }
 
-func (gun Gun) use() bool {
-	now := time.Now()
-	timestamp := now.UnixNano()
+func (gun Gun) use(player Player) bool {
+	timestamp := time.Now().UnixNano()
 	if (timestamp-gun.lastFire)/1000000 > gun.rateOfFire {
 		gun.lastFire = timestamp
+		game := games[player.gameId]
+
+		game.bullets[game.bulletId] = &Bullet{
+			&pb.Bullet{
+				Id:      game.bulletId,
+				OwnerId: player.id,
+				Type:    pb.BulletType_NORMAL,
+				State:   pb.State_SPAWN,
+				XPos:    player.ship.shipState.XPos,
+				YPos:    player.ship.shipState.YPos,
+				XVel:    player.ship.shipState.XVel,
+				YVel:    player.ship.shipState.YVel},
+			BulletDef{
+				damage:     gun.bulletDef.damage,
+				radius:     gun.bulletDef.radius,
+				timeToLive: gun.bulletDef.timeToLive},
+			timestamp}
+		game.bulletId++
 		return true
 	} else {
 		return false
 	}
-}
-
-type BulletDef struct {
-	radius     float32
-	timeToLive float64
 }

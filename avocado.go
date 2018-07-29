@@ -1,11 +1,7 @@
 package main
 
 import (
-	"log"
-	"math"
-	"math/rand"
 	"net/http"
-	"time"
 
 	pb "./proto"
 	"github.com/golang/protobuf/proto"
@@ -17,10 +13,8 @@ var clients = make(map[int32]*websocket.Conn)
 var players = make(map[int32]*Player)
 var games = make(map[int32]*Game)
 
-//var ships = make(map[int32]*pb.Ship)
-var shipUpdates = make(map[int32]*pb.ShipUpdate)
+//TODO eventually maybe this should be the players DB id instead of just generating one on login.
 var id int32 = 0
-var bulletId int32 = 0
 
 var state = &pb.GameState{Ships: []*pb.Ship{}}
 
@@ -35,7 +29,7 @@ func ReadClient(ws *websocket.Conn) {
 	//clients[id] = ws
 	players[id] = &Player{
 		id:        id,
-		state:     SIGN_IN,
+		state:     INITIAL_CONNECT,
 		websocket: ws}
 	id++
 
@@ -108,20 +102,10 @@ func ReadClient(ws *websocket.Conn) {
 		}*/
 }
 
-func unwrapMessage(data *[]byte) (pb.GenericMessage, error) {
-	message := new(pb.GenericMessage)
-	err := proto.Unmarshal(*data, message)
-	if err != nil {
-		return *message, err
-	} else {
-		return *message, nil
-	}
-}
-
 // This example demonstrates a trivial echo server.
 func main() {
 
-	go WorldUpdates()
+	// go WorldUpdates()
 
 	http.Handle("/ws", websocket.Handler(ReadClient))
 	fs := http.FileServer(http.Dir("public"))
@@ -130,166 +114,6 @@ func main() {
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}
-}
-
-func WorldUpdates() {
-	for {
-		time.Sleep(33000000) //In MS I assume?
-
-		now := time.Now()
-		timestamp := now.UnixNano()
-
-		//Apply user controls
-		for id, shipUpdate := range shipUpdates {
-			if shipUpdate != nil {
-				ship := ships[id]
-				//log.Printf("%v", ship)
-				if ship != nil {
-					if shipUpdate.RotLeft {
-						ship.RotVel -= rotAcceleration
-						if ship.RotVel < -maxRotVel {
-							ship.RotVel = -maxRotVel
-						}
-					}
-					if shipUpdate.RotRight {
-						ship.RotVel += rotAcceleration
-						if ship.RotVel > maxRotVel {
-							ship.RotVel = maxRotVel
-						}
-					}
-					if shipUpdate.Thrust {
-						ship.XVel += float32(math.Sin(float64(ship.Rot))) * thrust
-						ship.YVel += -float32(math.Cos(float64(ship.Rot))) * thrust
-						magnitude := float32(math.Sqrt(float64(ship.XVel*ship.XVel + ship.YVel*ship.YVel)))
-						if magnitude > maxVel {
-							scale := maxVel / magnitude
-							ship.XVel *= scale
-							ship.YVel *= scale
-						}
-					}
-					if shipUpdate.Fire {
-						bullet := new(pb.Ship_Bullet)
-						bullet.Id = bulletId
-						bulletId++
-						bullet.XPos = ship.XPos
-						bullet.XVel = ship.XVel + float32(math.Sin(float64(ship.Rot)))*maxVel
-						bullet.YPos = ship.YPos
-
-						bullet.YVel = ship.YVel - float32(math.Cos(float64(ship.Rot)))*maxVel
-						bullet.Timestamp = timestamp
-						ship.Bullets = append(ship.Bullets, bullet)
-					}
-				}
-
-				//Once we've applied the controls we set to nil so we can reset them next update
-				shipUpdates[id] = nil
-			}
-		}
-
-		//Apply velocities and check collisions
-		for _, ship := range ships {
-			ship.XPos += ship.XVel
-			ship.YPos += ship.YVel
-			if ship.XPos < 0 {
-				ship.XPos += worldWidth
-			} else if ship.XPos > worldWidth {
-				ship.XPos -= worldWidth
-			}
-			if ship.YPos < 0 {
-				ship.YPos += worldHeight
-			} else if ship.YPos > worldHeight {
-				ship.YPos -= worldHeight
-			}
-
-			log.Printf("x: %v  ,  y: %v", ship.XPos, ship.YPos)
-
-			ship.XVel *= velDampen
-			ship.YVel *= velDampen
-
-			ship.Rot += ship.RotVel
-			if ship.Rot > math.Pi*2 {
-				ship.Rot -= math.Pi * 2
-			} else if ship.Rot < 0 {
-				ship.Rot += math.Pi * 2
-			}
-			ship.RotVel *= rotDampen
-
-			//for i, bullet := range ship.Bullets {
-			for i := len(ship.Bullets) - 1; i >= 0; i-- {
-				bullet := ship.Bullets[i]
-				//Delete timed out bullets
-				if (timestamp-bullet.Timestamp)/1000000 > bulletTTL {
-					log.Printf("removing bullet: %v ", ship.Bullets[i])
-					ship.Bullets = append(ship.Bullets[:i], ship.Bullets[i+1:]...)
-				} else {
-					bullet.XPos += bullet.XVel
-					bullet.YPos += bullet.YVel
-
-					if bullet.XPos < 0 {
-						bullet.XPos += worldWidth
-					} else if bullet.XPos > worldWidth {
-						bullet.XPos -= worldWidth
-					}
-					if bullet.YPos < 0 {
-						bullet.YPos += worldHeight
-					} else if bullet.YPos > worldHeight {
-						bullet.YPos -= worldHeight
-					}
-					//TODO Test colision
-					for _, enemyShip := range ships {
-						if enemyShip == ship {
-							continue
-						}
-						deltaX := bullet.XPos - enemyShip.XPos
-						deltaY := bullet.YPos - enemyShip.YPos
-						if bulletRadius*bulletRadius > (deltaX*deltaX + deltaY*deltaY) {
-							//COLLISION!
-							ship.Bullets = append(ship.Bullets[:i], ship.Bullets[i+1:]...)
-							respawnShip(enemyShip)
-						}
-					}
-				}
-			}
-
-		}
-
-		//Send updated game state
-		stateBytes, err := proto.Marshal(state)
-		message := new(pb.GenericMessage)
-		message.MessageType = pb.GenericMessage_GAME_STATE_UPDATE
-		message.Data = stateBytes
-		out, err := proto.Marshal(message)
-
-		if err == nil {
-			err := SendToClients(&out)
-			if err != nil {
-				log.Printf("%v", err)
-			}
-		}
-	}
-}
-
-func respawnShip(enemyShip *pb.Ship) {
-	enemyShip.XVel = 0
-	enemyShip.YVel = 0
-	enemyShip.Rot = 0
-	enemyShip.XPos = rand.Float32() * worldWidth
-	enemyShip.YPos = rand.Float32() * worldHeight
-}
-
-func SendToClients(data *[]byte) error {
-	for _, client := range clients {
-		//client.Write(data)
-		frame, err := client.NewFrameWriter(websocket.BinaryFrame)
-		if err != nil {
-			return err
-		}
-		_, err = frame.Write(*data)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func CreateMessage(data []byte, messageType pb.GenericMessage_MessageTypeEnum) ([]byte, error) {
@@ -302,3 +126,149 @@ func CreateMessage(data []byte, messageType pb.GenericMessage_MessageTypeEnum) (
 	}
 	return out, nil
 }
+
+// func WorldUpdates() {
+// for {
+// 	//TODO I should take into account time to do update and subtract that from sleep time.
+// 	time.Sleep(33000000) //In nano seconds (33ms)
+
+// 	now := time.Now()
+// 	timestamp := now.UnixNano()
+
+// 	//Apply user controls
+// 	for id, shipUpdate := range shipUpdates {
+// 		if shipUpdate != nil {
+// 			ship := ships[id]
+// 			//log.Printf("%v", ship)
+// 			if ship != nil {
+// 				if shipUpdate.RotLeft {
+// 					ship.RotVel -= rotAcceleration
+// 					if ship.RotVel < -maxRotVel {
+// 						ship.RotVel = -maxRotVel
+// 					}
+// 				}
+// 				if shipUpdate.RotRight {
+// 					ship.RotVel += rotAcceleration
+// 					if ship.RotVel > maxRotVel {
+// 						ship.RotVel = maxRotVel
+// 					}
+// 				}
+// 				if shipUpdate.Thrust {
+// 					ship.XVel += float32(math.Sin(float64(ship.Rot))) * thrust
+// 					ship.YVel += -float32(math.Cos(float64(ship.Rot))) * thrust
+// 					magnitude := float32(math.Sqrt(float64(ship.XVel*ship.XVel + ship.YVel*ship.YVel)))
+// 					if magnitude > maxVel {
+// 						scale := maxVel / magnitude
+// 						ship.XVel *= scale
+// 						ship.YVel *= scale
+// 					}
+// 				}
+// 				if shipUpdate.Fire {
+// 					bullet := new(pb.Ship_Bullet)
+// 					bullet.Id = bulletId
+// 					bulletId++
+// 					bullet.XPos = ship.XPos
+// 					bullet.XVel = ship.XVel + float32(math.Sin(float64(ship.Rot)))*maxVel
+// 					bullet.YPos = ship.YPos
+
+// 					bullet.YVel = ship.YVel - float32(math.Cos(float64(ship.Rot)))*maxVel
+// 					bullet.Timestamp = timestamp
+// 					ship.Bullets = append(ship.Bullets, bullet)
+// 				}
+// 			}
+
+// 			//Once we've applied the controls we set to nil so we can reset them next update
+// 			shipUpdates[id] = nil
+// 		}
+// 	}
+
+// 	//Apply velocities and check collisions
+// 	for _, ship := range ships {
+// 		ship.XPos += ship.XVel
+// 		ship.YPos += ship.YVel
+// 		if ship.XPos < 0 {
+// 			ship.XPos += worldWidth
+// 		} else if ship.XPos > worldWidth {
+// 			ship.XPos -= worldWidth
+// 		}
+// 		if ship.YPos < 0 {
+// 			ship.YPos += worldHeight
+// 		} else if ship.YPos > worldHeight {
+// 			ship.YPos -= worldHeight
+// 		}
+
+// 		log.Printf("x: %v  ,  y: %v", ship.XPos, ship.YPos)
+
+// 		ship.XVel *= velDampen
+// 		ship.YVel *= velDampen
+
+// 		ship.Rot += ship.RotVel
+// 		if ship.Rot > math.Pi*2 {
+// 			ship.Rot -= math.Pi * 2
+// 		} else if ship.Rot < 0 {
+// 			ship.Rot += math.Pi * 2
+// 		}
+// 		ship.RotVel *= rotDampen
+
+// 		//for i, bullet := range ship.Bullets {
+// 		for i := len(ship.Bullets) - 1; i >= 0; i-- {
+// 			bullet := ship.Bullets[i]
+// 			//Delete timed out bullets
+// 			if (timestamp-bullet.Timestamp)/1000000 > bulletTTL {
+// 				log.Printf("removing bullet: %v ", ship.Bullets[i])
+// 				ship.Bullets = append(ship.Bullets[:i], ship.Bullets[i+1:]...)
+// 			} else {
+// 				bullet.XPos += bullet.XVel
+// 				bullet.YPos += bullet.YVel
+
+// 				if bullet.XPos < 0 {
+// 					bullet.XPos += worldWidth
+// 				} else if bullet.XPos > worldWidth {
+// 					bullet.XPos -= worldWidth
+// 				}
+// 				if bullet.YPos < 0 {
+// 					bullet.YPos += worldHeight
+// 				} else if bullet.YPos > worldHeight {
+// 					bullet.YPos -= worldHeight
+// 				}
+// 				//TODO Test colision
+// 				for _, enemyShip := range ships {
+// 					if enemyShip == ship {
+// 						continue
+// 					}
+// 					deltaX := bullet.XPos - enemyShip.XPos
+// 					deltaY := bullet.YPos - enemyShip.YPos
+// 					if bulletRadius*bulletRadius > (deltaX*deltaX + deltaY*deltaY) {
+// 						//COLLISION!
+// 						ship.Bullets = append(ship.Bullets[:i], ship.Bullets[i+1:]...)
+// 						respawnShip(enemyShip)
+// 					}
+// 				}
+// 			}
+// 		}
+
+// 	}
+
+// 	//Send updated game state
+// 	stateBytes, err := proto.Marshal(state)
+// 	message := new(pb.GenericMessage)
+// 	message.MessageType = pb.GenericMessage_GAME_STATE_UPDATE
+// 	message.Data = stateBytes
+// 	out, err := proto.Marshal(message)
+
+// 	if err == nil {
+// 		err := SendToClients(&out)
+// 		if err != nil {
+// 			log.Printf("%v", err)
+// 		}
+// 	}
+// }
+// }
+
+// func respawnShip(enemyShip *pb.Ship) {
+// 	enemyShip.XVel = 0
+// 	enemyShip.YVel = 0
+// 	enemyShip.Rot = 0
+// 	enemyShip.XPos = rand.Float32() * worldWidth
+// 	enemyShip.YPos = rand.Float32() * worldHeight
+// }
